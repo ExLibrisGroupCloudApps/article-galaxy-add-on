@@ -1,0 +1,12 @@
+{
+   "id": "reprints-cload-app",
+   "title": "Article Galaxy Add-on",
+   "subtitle": "Article Galaxy Add-on",
+   "author": "Gal Melamed Turgeman",
+   "description": "app desc",
+   "pages": {},
+   "icon": {
+      "type": "url",
+      "value": "/assets/AppLogo.png"
+   }
+}

@@ -1,0 +1,144 @@
+::ng-deep .mat-pseudo-checkbox{
+  align-self: flex-start;
+  margin-top: 1em;
+}
+
+::ng-deep .mat-list-item-disabled{
+  background-color: transparent!important;
+}
+
+.order-button{
+  margin-bottom: 1em;
+}
+
+.entity-option-disabled{
+  cursor: default!important;
+  ::ng-deep .mat-pseudo-checkbox{
+    color: #b0b0b0;
+    cursor: default!important;
+  }
+}
+
+.eca-actions{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between!important;
+
+  .select-all-checkbox{
+    align-self: flex-start;
+    padding-left: 16px;
+
+    ::ng-deep .mat-checkbox-label{
+      font-size: 16px;
+      font-weight: 400;
+      color: #314456;
+    }
+
+    ::ng-deep .mat-checkbox-frame{
+      border-width: 2px!important;
+    }
+  }
+
+  .request-all-button{
+    align-self: flex-end;
+  }
+}
+
+.request-info{
+  display: flex;
+  flex-direction: column;
+  margin-top: 1em!important;
+  margin-bottom: 1em!important;
+}
+
+.request-info-field{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 14px;
+  color: #5e5e5e;
+  line-height: 1.3em;
+}
+
+.request-info-field-key{
+  font-weight: 400;
+  margin-right: 8px;
+}
+
+.request-info-field-value{
+  font-weight: 300;
+  margin-right: 8px;
+}
+
+.request-info-title{
+  font-size: 16px;
+  font-weight: 400;
+  margin-bottom: 0.5em;
+  color: #314456;
+}
+
+.request-info-author{
+  font-size: 16px;
+  font-weight: 300;
+  margin-bottom: 0.5em;
+}
+
+.request-price-button{
+  margin-top: 0.5em;
+}
+
+.request-error-msg{
+  width: fit-content;
+  border-radius: 5px;
+  margin-top: 0.5em;
+  border: #f44336 solid 2px;
+  background-color: #ffdddd;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+
+  mat-icon{
+    margin-left: 5px;
+  }
+}
+
+.request-success-msg{
+  width: fit-content;
+  border-radius: 5px;
+  margin-top: 0.5em;
+  border: #4CAF50 solid 2px;
+  background-color: #ddffdd;
+  padding: 5px;
+}
+
+.footer{
+  background-color: #E0E0E0;
+  border-radius: 5px;
+
+  .footer-text{
+    display: flex;
+    flex-direction: column;
+    padding: 0.5em;
+    line-height: 150%;
+    color: black;
+
+    .footer-key{
+      font-weight: 400;
+    }
+  
+    .footer-value{
+      padding-bottom: 1em;
+    }
+  }
+}
+
+.links{
+  display: flex;
+  flex-direction: column;
+  padding-left: 1em;
+  line-height: 150%;
+
+  ::ng-deep ul{
+    padding: inherit;
+  }
+}
