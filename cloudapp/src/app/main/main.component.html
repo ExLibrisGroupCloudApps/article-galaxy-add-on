@@ -40,11 +40,13 @@
               <button mat-flat-button class="primary" color="primary" (click)="onPlaceOrderClicked($event, entity.id)">Request PDF ${{getEntityPrice(entity.id)}}</button>
             </div>
             <div class="request-error-msg" *ngIf="pricesLoaded && getEntityPrice(entity.id) && getEntityPrice(entity.id)==-1">
-              Article Galaxy cannot fill this request
+              Not in AG collection.  
+              <a href="mailto:academic@reprintsdesk.com" target=”_blank”> Ask about options.</a>
               <mat-icon matTooltip="{{ getEntityPriceErrorMsg(entity.id) }}" [matTooltipDisabled]="false">error_outline</mat-icon>
             </div>
             <div class="request-error-msg" *ngIf="getEntityOrderStatus(entity.id) == 'done' && !getEntityOrderSuccess(entity.id)">
-              Article Galaxy cannot fill this request
+              Not in AG collection.  
+              <a href="mailto:academic@reprintsdesk.com" target=”_blank”> Ask about options.</a>
               <mat-icon matTooltip="{{ getEntityOrderErrorMsg(entity.id) }}" [matTooltipDisabled]="false">error_outline</mat-icon>
             </div>
             <div class="request-success-msg" *ngIf="getEntityOrderStatus(entity.id) == 'done' && getEntityOrderSuccess(entity.id)">The request was successfully submitted</div>

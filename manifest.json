@@ -3,7 +3,7 @@
    "title": "Article Galaxy Add-on",
    "subtitle": "Article Galaxy Add-on",
    "author": "Gal Melamed Turgeman",
-   "description": "app desc",
+   "description": "Quickly determine if a copyright-paid copy of an article is available from the Article Galaxy Academic collection.  Articles are typically delivered in minutes. Available to libraries with an Article Galaxy account.",
    "pages": {},
    "icon": {
       "type": "url",
