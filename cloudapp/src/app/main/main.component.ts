@@ -204,6 +204,9 @@ export class MainComponent implements OnInit, OnDestroy {
   getEntityPrice(entityId){
     let priceObject = this.requestToPrice.get(entityId);
     if(priceObject && priceObject.price){
+      if(priceObject.price.length == 4){
+        return priceObject.price + '0';
+      }
       return priceObject.price;
     }
     return "-1";
@@ -280,6 +283,7 @@ export class MainComponent implements OnInit, OnDestroy {
     }
     return false;
   }
+
 }
 
 const isRestErrorResponse = (object: any): object is RestErrorResponse => 'error' in object;
