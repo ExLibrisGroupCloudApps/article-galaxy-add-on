@@ -16,7 +16,7 @@
         </div>
     </div>
       <mat-selection-list #requests (selectionChange)="onSelectedChanged($event)">
-        <mat-list-option *ngFor="let entity of pageEntities" [value]="entity" [checkboxPosition]="before" [ngClass]="(isEnabled(entity.id) && pricesLoaded) ? 'entity-option' : 'entity-option-disabled'">
+        <mat-list-option *ngFor="let entity of pageEntities" [value]="entity"  [ngClass]="(isEnabled(entity.id) && pricesLoaded) ? 'entity-option' : 'entity-option-disabled'">
           <div class="request-info">
             <span class="request-info-title" color="primary">{{entity.description}}</span>
             <span class="request-info-author" *ngIf="getEntityAuthor(entity.id) && getEntityAuthor(entity.id)!=''">{{getEntityAuthor(entity.id)}}</span>
@@ -37,10 +37,10 @@
               <div *ngIf="(!loading && !pricesLoaded) || getEntityOrderStatus(entity.id) == 'loading'">
                 <mat-spinner diameter="25"></mat-spinner>
               </div>
-              <div class="request-price-button" *ngIf="(pricesLoaded && getEntityPrice(entity.id)!=-1) && (getEntityOrderStatus(entity.id) != 'done' && getEntityOrderStatus(entity.id) != 'loading') && !getShowSubmitSpinner(entity.id)">
+              <div class="request-price-button" *ngIf="(pricesLoaded) && (getEntityOrderStatus(entity.id) != 'done' && getEntityOrderStatus(entity.id) != 'loading') && !getShowSubmitSpinner(entity.id)">
                 <button mat-flat-button class="primary" color="primary" (click)="onPlaceOrderClicked($event, entity.id)">Request PDF ${{getEntityPrice(entity.id)}}</button>
               </div>
-              <div class="request-error-msg" *ngIf="pricesLoaded && getEntityPrice(entity.id) && getEntityPrice(entity.id)==-1">
+              <div class="request-error-msg" *ngIf="pricesLoaded && getEntityPrice(entity.id)">
                 Not in AG collection.  
                 <a href="mailto:academic@reprintsdesk.com" target="_blank" onclick="window.open('mailto:academic@reprintsdesk.com','_blank');   
                     return false;"> Ask about options.
