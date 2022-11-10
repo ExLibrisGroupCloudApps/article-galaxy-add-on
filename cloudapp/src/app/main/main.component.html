@@ -37,10 +37,10 @@
               <div *ngIf="(!loading && !pricesLoaded) || getEntityOrderStatus(entity.id) == 'loading'">
                 <mat-spinner diameter="25"></mat-spinner>
               </div>
-              <div class="request-price-button" *ngIf="(pricesLoaded) && (getEntityOrderStatus(entity.id) != 'done' && getEntityOrderStatus(entity.id) != 'loading') && !getShowSubmitSpinner(entity.id)">
+              <div class="request-price-button" *ngIf="(pricesLoaded && getEntityPrice(entity.id)!='-1') && (getEntityOrderStatus(entity.id) != 'done' && getEntityOrderStatus(entity.id) != 'loading') && !getShowSubmitSpinner(entity.id)">
                 <button mat-flat-button class="primary" color="primary" (click)="onPlaceOrderClicked($event, entity.id)">Request PDF ${{getEntityPrice(entity.id)}}</button>
               </div>
-              <div class="request-error-msg" *ngIf="pricesLoaded && getEntityPrice(entity.id)">
+              <div class="request-error-msg" *ngIf="pricesLoaded && getEntityPrice(entity.id) && getEntityPrice(entity.id)=='-1'">
                 Not in AG collection.  
                 <a href="mailto:academic@reprintsdesk.com" target="_blank" onclick="window.open('mailto:academic@reprintsdesk.com','_blank');   
                     return false;"> Ask about options.
