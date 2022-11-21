@@ -217,7 +217,7 @@ export class MainComponent implements OnInit, OnDestroy {
     if(priceObject && priceObject.errorMsg){
       return priceObject.errorMsg;
     }
-    return "faild to calculate price";
+    return "failed to calculate price";
   }
 
   hasPriceErrorMsg(entityId){

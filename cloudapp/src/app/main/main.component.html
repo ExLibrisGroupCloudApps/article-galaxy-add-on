@@ -16,7 +16,7 @@
         </div>
     </div>
       <mat-selection-list #requests (selectionChange)="onSelectedChanged($event)">
-        <mat-list-option *ngFor="let entity of pageEntities" [value]="entity"  [ngClass]="(isEnabled(entity.id) && pricesLoaded) ? 'entity-option' : 'entity-option-disabled'">
+        <mat-list-option checkboxPosition="before" *ngFor="let entity of pageEntities" [value]="entity" [ngClass]="(isEnabled(entity.id) && pricesLoaded) ? 'entity-option' : 'entity-option-disabled'">
           <div class="request-info">
             <span class="request-info-title" color="primary">{{entity.description}}</span>
             <span class="request-info-author" *ngIf="getEntityAuthor(entity.id) && getEntityAuthor(entity.id)!=''">{{getEntityAuthor(entity.id)}}</span>
@@ -71,8 +71,8 @@
       <div class="links">
         <ul>
           <li><a href="https://www.reprintsdesk.com/login/forgotpassword.aspx" target="_blank">Forgot your password?</a></li>
-          <li>New to Article Galaxy?<a href="https://www.reprintsdesk.com/login/signup.aspx" target="_blank"> Sign up now</a></li>
-          <li>Need help?<a href="https://help.reprintsdesk.com/hc/en-us/" target="_blank"> Go to Article Galaxy Knowledge Center</a></li>
+          <li>New to Article Galaxy?<a href="https://www.researchsolutions.com/rapidill-document-delivery-sign-up-form" target="_blank"> Sign up now</a></li>
+          <li>Need help?<a href="https://help.reprintsdesk.com/hc/en-us/" target="_blank"> Go to Article Galaxy Knowledge Center</a> or <a href="mailto:academic@reprintsdesk.com" target="_blank"> send an email</a></li>
         </ul>
       </div>
     </ng-template>
