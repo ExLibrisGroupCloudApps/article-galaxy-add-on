@@ -151,7 +151,7 @@ export class MainComponent implements OnInit, OnDestroy {
   updatePartner(placeOrderResponse : PlaceOrderResponse){
     forkJoin({ initData: this.eventsService.getInitData(), authToken: this.eventsService.getAuthToken() }).pipe(concatMap((data) => {
 
-      let updateUrl = "/../../rapido-api/v1/user/exl_impl/resource-sharing-requests/" + placeOrderResponse.requestId + "?op=assign_request_to_partner&partner=Reprints_Desk&partner_request_id=" + placeOrderResponse.additionalId + "&partner_additional_id=" + placeOrderResponse.randomNumber;
+      let updateUrl = "/rapido/v1/user/exl_impl/resource-sharing-requests/" + placeOrderResponse.requestId + "?op=assign_request_to_partner&partner=Reprints_Desk&partner_request_id=" + placeOrderResponse.additionalId + "&partner_additional_id=" + placeOrderResponse.randomNumber;
       let priceObject = this.requestToPrice.get(placeOrderResponse.requestId);
       if(priceObject && priceObject.price){
         updateUrl += "&cost=" + priceObject.price;
