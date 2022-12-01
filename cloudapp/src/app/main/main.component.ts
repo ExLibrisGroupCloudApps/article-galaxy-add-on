@@ -106,7 +106,7 @@ export class MainComponent implements OnInit, OnDestroy {
       let calls = [];      
       selectedRequests.forEach(entity => calls.push(this.http.post<any>(url + "?op=Order_PlaceOrder2&requestId=" + entity.id, [], { headers }).pipe(
         map((res) => {
-          this.updatePartner(res);
+          this.updatePartner(res, entity.id);
           res.status = "done";
           this.requestToOrder.set(res.requestId, res);
         }), 
@@ -134,7 +134,7 @@ export class MainComponent implements OnInit, OnDestroy {
       return this.http.post<any>(url + "?op=Order_PlaceOrder2&requestId=" + entityId, [], { headers });
     })).subscribe({
       next: response => {
-        this.updatePartner(response);
+        this.updatePartner(response, entityId);
         response.status = "done";
         this.requestToOrder.set(response.requestId, response);
       }, error: error => {
@@ -143,8 +143,9 @@ export class MainComponent implements OnInit, OnDestroy {
     });
   }
 
-  updatePartner(placeOrderResponse : PlaceOrderResponse){
-    let updateUrl = "/rapido/v1/user/exl_impl/resource-sharing-requests/" + placeOrderResponse.requestId + "?op=assign_request_to_partner&partner=Reprints_Desk&partner_request_id=" + placeOrderResponse.additionalId + "&partner_additional_id=" + placeOrderResponse.randomNumber;
+  updatePartner(placeOrderResponse : PlaceOrderResponse, entityId){
+    let requestObject = this.requestIdToRequest.get(entityId);
+    let updateUrl = "/rapido/v1/user/" + requestObject.requester.value + "/resource-sharing-requests/" + placeOrderResponse.requestId + "?op=assign_request_to_partner&partner=Reprints_Desk&partner_request_id=" + placeOrderResponse.additionalId + "&partner_additional_id=" + placeOrderResponse.randomNumber;
     let priceObject = this.requestToPrice.get(placeOrderResponse.requestId);
     if(priceObject && priceObject.price){
       updateUrl += "&cost=" + priceObject.price;
