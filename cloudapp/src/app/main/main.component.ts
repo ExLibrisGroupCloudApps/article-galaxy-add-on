@@ -23,6 +23,7 @@ export class MainComponent implements OnInit, OnDestroy {
   apiResult: any;
   showPlaceOrderSpinner = false;
   borrowingTaskList = false;
+  validCredentials = true;
   requestIdToRequest = new Map();
   requestToPrice : Map<string,PriceResponse> = new Map<string,PriceResponse>();
   requestToOrder : Map<string,PlaceOrderResponse> = new Map<string,PlaceOrderResponse>();
@@ -47,8 +48,11 @@ export class MainComponent implements OnInit, OnDestroy {
   onPageLoad = (pageInfo: PageInfo) => {
     this.pageEntities = pageInfo.entities;
     if ((this.pageEntities || []).length > 0 && this.pageEntities[0].type === 'BORROWING_REQUEST') {
+      this.requestIdToRequest.clear();
+      this.requestToPrice.clear();
+      this.requestToOrder.clear();
       this.loadEntities();
-      this.loadPrices();
+      this.credentialsCheck();
     } 
   }
 
@@ -79,6 +83,7 @@ export class MainComponent implements OnInit, OnDestroy {
       let url = data.initData.urls['alma'] + "view/ReprintsDeskCloudApp";
       let authHeader = "Bearer " + data.authToken;
       const headers = new HttpHeaders({ 'Authorization': authHeader});
+
       let calls = [];      
       this.pageEntities.forEach(entity => calls.push(this.http.post<any>(url + "?op=Order_GetPriceEstimate2&requestId=" + entity.id, [], { headers }).pipe(
         map((res) => this.requestToPrice.set(res.requestId, res)), 
@@ -89,6 +94,30 @@ export class MainComponent implements OnInit, OnDestroy {
       error: error => {
         console.log(error);
       }, complete: () => this.pricesLoaded = true
+    });
+  }
+
+  credentialsCheck(){
+    forkJoin({ initData: this.eventsService.getInitData(), authToken: this.eventsService.getAuthToken() }).pipe(concatMap((data) => {
+      let url = data.initData.urls['alma'] + "view/ReprintsDeskCloudApp";
+      let authHeader = "Bearer " + data.authToken;
+      let requestId = this.pageEntities[0].id;
+      const headers = new HttpHeaders({ 'Authorization': authHeader});
+      return this.http.post<any>(url + "?op=Order_GetPriceEstimate2&requestId=" + requestId, [], { headers });
+    })).subscribe({
+      next: res => {
+        if(res && res.errorMsg && res.errorMsg == "invalid user name or password"){
+          this.validCredentials = false;
+          this.pricesLoaded = true
+        }else{
+          this.loadPrices();
+        }       
+      }, 
+      error: error => {
+        console.log(error);
+        this.validCredentials = false;
+        this.pricesLoaded = true
+      }
     });
   }
   
