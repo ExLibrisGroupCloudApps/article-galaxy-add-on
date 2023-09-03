@@ -106,7 +106,7 @@ export class MainComponent implements OnInit, OnDestroy {
       return this.http.post<any>(url + "?op=Order_GetPriceEstimate2&requestId=" + requestId, [], { headers });
     })).subscribe({
       next: res => {
-        if(res && res.errorMsg && res.errorMsg == "invalid user name or password"){
+        if(res && res.errorMsg && res.errorMsg.toLowerCase() == "invalid user name or password"){
           this.validCredentials = false;
           this.pricesLoaded = true
         }else{
