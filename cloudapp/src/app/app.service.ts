@@ -8,17 +8,30 @@ import { BehaviorSubject, Observable } from 'rxjs';
 })
 export class AppService {
 
-    // private title = new BehaviorSubject<String>('App title');
+     private title = new BehaviorSubject<String>('App title');
     // private title$ = this.title.asObservable();
 
     constructor(private initService: InitService) {}
 
-    // setTitle(title: String) {
-    //     this.title.next(title);
-    // }
+    setTitle(title: String) {
+         this.title.next(title);
+     }
     
     // getTitle(): Observable<String> {
     //     return this.title$;
     // }
 
 }
+export class PartnerCodeService {
+    private partnerCode: string;
+  
+    constructor() { }
+  
+    getPartnerCode(): string {
+      return this.partnerCode;
+    }
+  
+    setPartnerCode(code: string): void {
+      this.partnerCode = code;
+    }
+  }

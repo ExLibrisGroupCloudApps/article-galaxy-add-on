@@ -1,85 +1,79 @@
 <div *ngIf="entities$ | async as entities">
-    <ng-container 
-      *ngIf="entities.length > 0 && entities[0].type === 'BORROWING_REQUEST'; then borrowingtasklist; else noentities"
-    ></ng-container>
-  
-    <ng-template #noentities>
-      <div class="highlight">To use this app, navigate to the Borrowing Requests page in Alma.</div>
-    </ng-template>
-    
-    <ng-template #borrowingtasklist>
-      <div class="eca-actions">
-        <mat-checkbox class="select-all-checkbox" (change)="$event.checked ? onSelectAllClicked() : requests.deselectAll()" [disabled]="!pricesLoaded">Select all</mat-checkbox>
-        <div class="request-all-button" *ngIf="requests.selectedOptions.selected.length > 0">
-          <button mat-flat-button class="primary" color="primary" (click)="onBulkPlaceOrderClicked(requests.selectedOptions.selected)" [disabled]="requests.selectedOptions.selected.length === 0 || !pricesLoaded">Request all {{requests.selectedOptions.selected.length}} items</button>
-          <!-- <button mat-flat-button color="secondary" (click)="requests.deselectAll()" [disabled]="requests.selectedOptions.selected.length === 0">Clear</button> -->
-        </div>
-    </div>
-      <mat-selection-list #requests (selectionChange)="onSelectedChanged($event)">
-        <mat-list-option checkboxPosition="before" *ngFor="let entity of pageEntities" [value]="entity" [ngClass]="(isEnabled(entity.id) && pricesLoaded) ? 'entity-option' : 'entity-option-disabled'">
-          <div class="request-info">
-            <span class="request-info-title" color="primary">{{entity.description}}</span>
-            <span class="request-info-author" *ngIf="getEntityAuthor(entity.id) && getEntityAuthor(entity.id)!=''">{{getEntityAuthor(entity.id)}}</span>
-            <div class="request-info-field" *ngIf="getEntityJournalTitle(entity.id) && getEntityJournalTitle(entity.id)!=''">
-              <span class="request-info-field-key">Journal title: </span>
-              <span class="request-info-field-value">{{getEntityJournalTitle(entity.id)}}</span>
-            </div>
-            <div class="request-info-field" *ngIf="getEntityPublication(entity.id) && getEntityPublication(entity.id)!=''">
-              <span class="request-info-field-key">Publication: </span>
-              <span class="request-info-field-value">{{getEntityPublication(entity.id)}}</span>
-            </div>
-            <div class="request-info-field" *ngIf="getEntityPages(entity.id) && getEntityPages(entity.id)!=''">
-              <span class="request-info-field-key">Pages: </span>
-              <span class="request-info-field-value">{{getEntityPages(entity.id)}}</span>
-            </div>
-            
-            <div class="button-msg-section">
-              <div *ngIf="(!loading && !pricesLoaded) || getEntityOrderStatus(entity.id) == 'loading'">
-                <mat-spinner diameter="25"></mat-spinner>
-              </div>
-              <div class="request-price-button" *ngIf="(pricesLoaded && getEntityPrice(entity.id)!='-1') && (getEntityOrderStatus(entity.id) != 'done' && getEntityOrderStatus(entity.id) != 'loading') && !getShowSubmitSpinner(entity.id)">
-                <button mat-flat-button class="primary" color="primary" (click)="onPlaceOrderClicked($event, entity.id)">Request PDF ${{getEntityPrice(entity.id)}}</button>
-              </div>
-              <div class="request-error-msg" *ngIf="pricesLoaded && !validCredentials">
-                Invalid user name or password.  
-              </div>
-              <div class="request-error-msg" *ngIf="pricesLoaded && validCredentials && getEntityPrice(entity.id) && getEntityPrice(entity.id)=='-1'">
-                Not in AG collection.  
-                <a href="mailto:academic@reprintsdesk.com" target="_blank" onclick="window.open('mailto:academic@reprintsdesk.com','_blank');   
-                    return false;"> Ask about options.
-                </a>                
-                <mat-icon matTooltip="{{ getEntityPriceErrorMsg(entity.id) }}" [matTooltipDisabled]="false">error_outline</mat-icon>
-              </div>
-              <div class="request-error-msg" *ngIf="getEntityOrderStatus(entity.id) == 'done' && !getEntityOrderSuccess(entity.id)">
-                Not in AG collection.  
-                <a href="mailto:academic@reprintsdesk.com" target="_blank" onclick="window.open('mailto:academic@reprintsdesk.com','_blank');   
-                    return false;"> Ask about options.
-                </a>                  
-                <mat-icon matTooltip="{{ getEntityOrderErrorMsg(entity.id) }}" [matTooltipDisabled]="false">error_outline</mat-icon>
-              </div>
-              <div class="request-success-msg" *ngIf="getEntityOrderStatus(entity.id) == 'done' && getEntityOrderSuccess(entity.id)">The request was successfully submitted</div>
-            </div>
+  <ng-container
+    *ngIf="entities.length > 0 && entities[0].type === 'BORROWING_REQUEST'; then borrowingtasklist; else noentities"
+  ></ng-container>
+ 
+   <ng-template #noentities>
+    <div class="highlight">To use this app, navigate to the Borrowing Requests page in Alma.</div>
+  </ng-template>
+ 
+ 
+ 
+  <ng-template #borrowingtasklist>
+    <div class="eca-actions">
+      <mat-checkbox class="select-all-checkbox" (change)="$event.checked ? onSelectAllClicked() : requests.deselectAll()" [disabled]="!pricesLoaded">Select all</mat-checkbox>
+      <div class="request-all-button" *ngIf="requests.selectedOptions.selected.length > 0">
+        <button mat-flat-button class="primary" color="primary" (click)="onBulkPlaceOrderClicked(requests.selectedOptions.selected)" [disabled]="requests.selectedOptions.selected.length === 0 || !pricesLoaded">Request all {{requests.selectedOptions.selected.length}} items</button>
+        <!-- <button mat-flat-button color="secondary" (click)="requests.deselectAll()" [disabled]="requests.selectedOptions.selected.length === 0">Clear</button> -->
+      </div>
+   </div>
+    <mat-selection-list #requests >
+      <mat-list-option checkboxPosition="before" *ngFor="let entity of pageEntities" [value]="entity" [ngClass]="(pricesLoaded) ? 'entity-option' : 'entity-option-disabled'">
+        <div class="request-info">
+          <span class="request-info-title" color="primary">{{entity.description}}</span>
+          <span class="request-info-author" *ngIf="getEntityAuthor(entity.id) && getEntityAuthor(entity.id)!=''">{{getEntityAuthor(entity.id)}}</span>
+          <div class="request-info-field" *ngIf="getEntityJournalTitle(entity.id) && getEntityJournalTitle(entity.id)!=''">
+            <span class="request-info-field-key">Journal title:</span>
+            <span class="request-info-field-value">{{getEntityJournalTitle(entity.id)}}</span>
           </div>
-          <mat-divider></mat-divider>
-        </mat-list-option>
-      </mat-selection-list>
-      <div class="footer">
-        <div class="footer-text">
-          <span class="footer-key">Your article will be delivered:</span>
-          <span class="footer-value">via the Rapido/RapidILL system</span>
-          <span class="footer-key">Intended use:</span>
-          <span>For my own use or for a colleague within my organization</span>
+          <div class="request-info-field" *ngIf="getEntityPublication(entity.id) && getEntityPublication(entity.id)!=''">
+            <span class="request-info-field-key">Publication: </span>
+            <span class="request-info-field-value">{{getEntityPublication(entity.id)}}</span>
+          </div>
+          <div class="request-info-field" *ngIf="getEntityPages(entity.id) && getEntityPages(entity.id)!=''">
+            <span class="request-info-field-key">Pages: </span>
+            <span class="request-info-field-value">{{getEntityPages(entity.id)}}</span>
+          </div>
+         
+          <div class="button-msg-section">
+            <div *ngIf="(!loading && !pricesLoaded) || getEntityOrderStatus(entity.id) == 'loading'">
+              <mat-spinner diameter="25"></mat-spinner>
+            </div>
+            <div class="request-price-button" *ngIf="buttonVisibility[entity.id]&&(pricesLoaded && getEntityPrice(entity.id)!='-1') && (getEntityOrderStatus(entity.id) != 'done' && getEntityOrderStatus(entity.id) != 'loading') && !getShowSubmitSpinner(entity.id)">
+              <button mat-flat-button class="primary" color="primary" (click)="onPlaceOrderClicked($event, entity.id)">Request PDF ${{getEntityPrice(entity.id)}}</button>
+            </div>
+            <div class="request-error-msg" *ngIf="pricesLoaded && !validCredentials">
+              Invalid user name or password.  
+            </div>
+            <div class="request-price-button" *ngIf="buttonVisibility[entity.id]&&pricesLoaded && validCredentials && getEntityPrice(entity.id) && getEntityPrice(entity.id)=='-1'">
+             <button mat-flat-button class="primary" color="primary" (click)="onPlaceOrderClicked($event, entity.id)">Price unavailable - Request anyway</button>  
+             </div>
+            <div class="request-error-msg" *ngIf="getEntityOrderStatus(entity.id) == 'error' && !getEntityOrderSuccess(entity.id)">
+              {{getEntityOrderErrorMsg(entity.id)}}
+             </div>
+            <div class="request-success-msg" *ngIf="getEntityOrderStatus(entity.id) == 'done' && getEntityOrderSuccess(entity.id)">The request was successfully submitted</div>
+          </div>
         </div>
+        <mat-divider></mat-divider>
+      </mat-list-option>
+    </mat-selection-list>
+    <div class="footer">
+      <div class="footer-text">
+        <span class="footer-key">Your article will be delivered:</span>
+        <span class="footer-value">via the Rapido/RapidILL system</span>
+        <span class="footer-key">Intended use:</span>
+        <span>For my own use or for a colleague within my organization</span>
       </div>
-      <div class="links">
-        <ul>
-          <li><a href="https://www.reprintsdesk.com/login/forgotpassword.aspx" target="_blank">Forgot your password?</a></li>
-          <li>New to Article Galaxy?<a href="https://www.researchsolutions.com/rapidill-document-delivery-sign-up-form" target="_blank"> Sign up now</a></li>
-          <li>Need help?<a href="https://help.reprintsdesk.com/hc/en-us/" target="_blank"> Go to Article Galaxy Knowledge Center</a> or <a href="mailto:academic@reprintsdesk.com" target="_blank"> send an email</a></li>
-        </ul>
-      </div>
-    </ng-template>
-  </div>
-  <div class="loading-shade" *ngIf="loading">
-    <mat-spinner diameter="50"></mat-spinner>
-  </div>
+    </div>
+    <div class="links">
+      <ul>
+        <li><a href="https://www.reprintsdesk.com/login/forgotpassword.aspx" target="_blank">Forgot your password?</a></li>
+        <li>New to Article Galaxy?<a href="https://www.researchsolutions.com/rapidill-document-delivery-sign-up-form" target="_blank"> Sign up now</a></li>
+        <li>Need help?<a href="https://help.reprintsdesk.com/hc/en-us/" target="_blank"> Go to Article Galaxy Knowledge Center</a> or <a href="mailto:academic@reprintsdesk.com" target="_blank"> send an email</a></li>
+      </ul>
+    </div>
+  </ng-template>
+</div>
+<div class="loading-shade" *ngIf="loading">
+  <mat-spinner diameter="50"></mat-spinner>
+</div>

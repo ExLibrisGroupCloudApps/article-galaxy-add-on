@@ -12,7 +12,9 @@
       ]
    },
    "description": "Quickly determine if a copyright-paid copy of an article is available from the Article Galaxy Academic collection. Articles are typically delivered in minutes. Available to libraries with an Article Galaxy account. This Cloud App is only available for Rapido customers.",
-   "pages": {},
+   "pages": {
+      "config": "/#/configuration"
+   },
    "icon": {
       "type": "url",
       "value": "/assets/AppLogo.png"

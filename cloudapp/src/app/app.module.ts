@@ -9,11 +9,14 @@ import { MaterialModule, CloudAppTranslateModule, AlertModule } from '@exlibris/
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { MainComponent } from './main/main.component';
+import { ConfigurationComponent } from './configuration/configuration.component';
+import { PartnerCodeService } from './app.service';
 
 @NgModule({
   declarations: [
     AppComponent,
     MainComponent,
+    ConfigurationComponent,
   ],
   imports: [
     MaterialModule,
@@ -28,6 +31,7 @@ import { MainComponent } from './main/main.component';
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'standard' } },
+    PartnerCodeService
   ],
   bootstrap: [AppComponent]
 })

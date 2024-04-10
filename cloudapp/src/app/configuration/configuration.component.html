@@ -1,0 +1,18 @@
+<div class="loading-shade" *ngIf="saving">
+    <mat-spinner diameter="50"></mat-spinner>
+</div>
+<form [formGroup]="form" *ngIf="form">
+    <div class="cloudapp-actions">
+        <button mat-flat-button color="secondary" [routerLink]="['/']">
+            <mat-icon>arrow_back</mat-icon>Back
+        </button>
+        <button mat-flat-button color="primary" type="button" (click)="save()" [disabled]="!form.dirty">Save</button>
+    </div>
+    <h1>Configuration</h1>
+     <section class="settings-section">
+        <mat-form-field id="partner-code" appearance="standard">
+            <mat-label>Partner Code</mat-label>
+            <input matInput id="partner-code" name="partnerCode" formControlName="partnerCode"/>
+        </mat-form-field>
+    </section>
+</form>

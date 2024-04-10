@@ -1,12 +1,15 @@
 import { Subscription, forkJoin, Observable, of } from 'rxjs';
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { CloudAppRestService, CloudAppEventsService, 
+import { CloudAppRestService, CloudAppEventsService,
   Entity, PageInfo, RestErrorResponse, HttpMethod, Request } from '@exlibris/exl-cloudapp-angular-lib';
 import {  MatSelectionList, MatListOption, MatSelectionListChange } from '@angular/material/list';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { concatMap, map, catchError} from 'rxjs/operators';
 import { PriceResponse, PlaceOrderResponse } from '../models/response';
-
+import { ConfigurationComponent } from '../configuration/configuration.component';
+import { PartnerCodeService } from '../app.service';
+import { MatTabChangeEvent } from '@angular/material/tabs';
+ 
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -27,24 +30,31 @@ export class MainComponent implements OnInit, OnDestroy {
   requestIdToRequest = new Map();
   requestToPrice : Map<string,PriceResponse> = new Map<string,PriceResponse>();
   requestToOrder : Map<string,PlaceOrderResponse> = new Map<string,PlaceOrderResponse>();
-
+  buttonVisibility : {[key:string]:boolean} = {};                                                                                              
   entities$: Observable<Entity[]> = this.eventsService.entities$
-
+  partnerCode = this.partnerCodeService.getPartnerCode();                                                                                    
+ 
   constructor(
+    private partnerCodeService: PartnerCodeService,
     private restService: CloudAppRestService,
     private eventsService: CloudAppEventsService,
     private http: HttpClient,
-  ) { 
-
+  ) {
+ 
+ 
   }
-
+ 
+ 
   ngOnInit() {
     this.pageLoad$ = this.eventsService.onPageLoad(this.onPageLoad);
-  }
-
+    this.partnerCode = this.partnerCode ? this.partnerCode : "Reprints_Desk";                                                      
+}
+ 
+ 
   ngOnDestroy(): void {
   }
-
+ 
+ 
   onPageLoad = (pageInfo: PageInfo) => {
     this.pageEntities = pageInfo.entities;
     if ((this.pageEntities || []).length > 0 && this.pageEntities[0].type === 'BORROWING_REQUEST') {
@@ -53,9 +63,15 @@ export class MainComponent implements OnInit, OnDestroy {
       this.requestToOrder.clear();
       this.loadEntities();
       this.credentialsCheck();
-    } 
+      this.entities$.subscribe(entities=>{              
+        entities.forEach(entity => {
+          this.buttonVisibility[entity.id] = true
+        });
+      });                                                
+    }
   }
-
+ 
+ 
   loadEntities(){
     this.loading = true;
     let calls = [];
@@ -77,16 +93,17 @@ export class MainComponent implements OnInit, OnDestroy {
       }      
     });
   }
-
+ 
+ 
   loadPrices(){
     forkJoin({ initData: this.eventsService.getInitData(), authToken: this.eventsService.getAuthToken() }).pipe(concatMap((data) => {
       let url = data.initData.urls['alma'] + "view/ReprintsDeskCloudApp";
       let authHeader = "Bearer " + data.authToken;
       const headers = new HttpHeaders({ 'Authorization': authHeader});
-
+ 
       let calls = [];      
       this.pageEntities.forEach(entity => calls.push(this.http.post<any>(url + "?op=Order_GetPriceEstimate2&requestId=" + entity.id, [], { headers }).pipe(
-        map((res) => this.requestToPrice.set(res.requestId, res)), 
+        map((res) => this.requestToPrice.set(res.requestId, res)),
         catchError(e => of(e))
       )));
       return forkJoin(calls);
@@ -96,7 +113,8 @@ export class MainComponent implements OnInit, OnDestroy {
       }, complete: () => this.pricesLoaded = true
     });
   }
-
+ 
+ 
   credentialsCheck(){
     forkJoin({ initData: this.eventsService.getInitData(), authToken: this.eventsService.getAuthToken() }).pipe(concatMap((data) => {
       let url = data.initData.urls['alma'] + "view/ReprintsDeskCloudApp";
@@ -111,8 +129,8 @@ export class MainComponent implements OnInit, OnDestroy {
           this.pricesLoaded = true
         }else{
           this.loadPrices();
-        }       
-      }, 
+        }      
+      },
       error: error => {
         console.log(error);
         this.validCredentials = false;
@@ -120,10 +138,12 @@ export class MainComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+ 
+ 
   onBulkPlaceOrderClicked(selectedOptions: MatListOption[]){
     let selectedRequests = selectedOptions.map(o => o.value);
     selectedRequests.forEach(entity => {
+      this.buttonVisibility[entity.id] = false;
       let orderObject = new PlaceOrderResponse();
       orderObject.status = "loading";
       this.requestToOrder.set(entity.id, orderObject)
@@ -135,10 +155,13 @@ export class MainComponent implements OnInit, OnDestroy {
       let calls = [];      
       selectedRequests.forEach(entity => calls.push(this.http.post<any>(url + "?op=Order_PlaceOrder2&requestId=" + entity.id, [], { headers }).pipe(
         map((res) => {
-          this.updatePartner(res, entity.id);
-          res.status = "done";
-          this.requestToOrder.set(res.requestId, res);
-        }), 
+          console.log(res);
+          if(!res.errorMsg){
+           this.updatePartner(res, entity.id,res);
+          }
+         this.requestToOrder.set(res.requestId, res);
+         res.status="error"
+        }),
         catchError(e => of(e))
       )));
       return forkJoin(calls);
@@ -148,10 +171,12 @@ export class MainComponent implements OnInit, OnDestroy {
       }, complete: () => this.placeOrderEnded = true
     });
   }
-
+ 
+ 
   onPlaceOrderClicked(event, entityId){
     event.preventDefault();
     event.stopPropagation();
+    this.buttonVisibility[entityId] = false;
     this.placeOrderEnded = false;
     let orderObject = new PlaceOrderResponse();
     orderObject.status = "loading";
@@ -163,18 +188,21 @@ export class MainComponent implements OnInit, OnDestroy {
       return this.http.post<any>(url + "?op=Order_PlaceOrder2&requestId=" + entityId, [], { headers });
     })).subscribe({
       next: response => {
-        this.updatePartner(response, entityId);
-        response.status = "done";
+        if(!response.errorMsg){
+          this.updatePartner(response, entityId, response);
+         }
+        orderObject.errorMsg=response.errorMsg;  
+        response.status = "error";
         this.requestToOrder.set(response.requestId, response);
       }, error: error => {
         console.log(error);
       }
     });
   }
-
-  updatePartner(placeOrderResponse : PlaceOrderResponse, entityId){
+ 
+updatePartner(placeOrderResponse : PlaceOrderResponse, entityId,response?){
     let requestObject = this.requestIdToRequest.get(entityId);
-    let updateUrl = "/rapido/v1/user/" + requestObject.requester.value + "/resource-sharing-requests/" + placeOrderResponse.requestId + "?op=assign_request_to_partner&partner=Reprints_Desk&partner_request_id=" + placeOrderResponse.additionalId + "&partner_additional_id=" + placeOrderResponse.randomNumber;
+    let updateUrl = "/rapido/v1/user/" + requestObject.requester.value + "/resource-sharing-requests/" + placeOrderResponse.requestId + "?op=assign_request_to_partner&partner="+this.partnerCode+"&partner_request_id=" + placeOrderResponse.additionalId + "&partner_additional_id=" + placeOrderResponse.randomNumber;
     let priceObject = this.requestToPrice.get(placeOrderResponse.requestId);
     if(priceObject && priceObject.price){
       updateUrl += "&cost=" + priceObject.price;
@@ -186,44 +214,47 @@ export class MainComponent implements OnInit, OnDestroy {
     this.restService.call(request).subscribe({
       error: error => {
         console.log(error);
+        placeOrderResponse.errorMsg=`The request was successfully submitted but was not updated in Rapido - error from API.External id:${placeOrderResponse.additionalId},additional id:${placeOrderResponse.randomNumber}`
+       //this.buttonVisibility[entityId] = false;
+       response.status="error"
         this.placeOrderEnded = true;
-      }, complete: () => this.placeOrderEnded = true
+      }, complete: () => {this.placeOrderEnded = true; response.status="done"}
     });
   }
-
-  getEntityAuthor(entityId){
+ 
+getEntityAuthor(entityId){
     let requestObject = this.requestIdToRequest.get(entityId);
     if(requestObject && requestObject.author){
       return requestObject.author;
     }
     return "";
   }
-
-  getEntityJournalTitle(entityId){
+ 
+getEntityJournalTitle(entityId){
     let requestObject = this.requestIdToRequest.get(entityId);
     if(requestObject && requestObject.journal_title){
       return requestObject.journal_title;
     }
     return "";
   }
-
-  getEntityPublication(entityId){
+ 
+getEntityPublication(entityId){
     let requestObject = this.requestIdToRequest.get(entityId);
     if(requestObject && requestObject.year){
       return requestObject.year;
     }
     return "";
   }
-
-  getEntityPages(entityId){
+ 
+getEntityPages(entityId){
     let requestObject = this.requestIdToRequest.get(entityId);
     if(requestObject && requestObject.pages){
       return requestObject.pages;
     }
     return "";
   }
-
-  getEntityPrice(entityId){
+ 
+getEntityPrice(entityId){
     let priceObject = this.requestToPrice.get(entityId);
     if(priceObject && priceObject.price){
       if(priceObject.price.length == 4){
@@ -233,79 +264,79 @@ export class MainComponent implements OnInit, OnDestroy {
     }
     return "-1";
   }
-
-  getEntityPriceErrorMsg(entityId){
+ 
+getEntityPriceErrorMsg(entityId){
     let priceObject = this.requestToPrice.get(entityId);
     if(priceObject && priceObject.errorMsg){
       return priceObject.errorMsg;
     }
     return "failed to calculate price";
   }
-
-  hasPriceErrorMsg(entityId){
+ 
+hasPriceErrorMsg(entityId){
     let priceObject = this.requestToPrice.get(entityId);
     if(priceObject && priceObject.errorMsg){
       return true;
     }
     return false;
   }
-
-  getEntityOrderSuccess(entityId){
+ 
+getEntityOrderSuccess(entityId){
     let orderObject = this.requestToOrder.get(entityId);
     if(orderObject && !orderObject.errorMsg){
       return true;
     }
     return false;
   }
-
-  getEntityOrderStatus(entityId){
+ 
+getEntityOrderStatus(entityId){
     let orderObject = this.requestToOrder.get(entityId);
     if(orderObject && orderObject.status){
       return orderObject.status;
     }
     return "";
   }
-
-  getEntityOrderErrorMsg(entityId){
+ 
+getEntityOrderErrorMsg(entityId){
     let orderObject = this.requestToOrder.get(entityId);
     if(orderObject && orderObject.errorMsg){
       return orderObject.errorMsg;
     }
     return "faild to place order";
   }
-
-  onSelectAllClicked(){
+ 
+ onSelectAllClicked(){
     this.requests.options.forEach(request => {
       if(this.isEnabled(request.value.id)){
         request.selected = true;
       }
     });
   }
-
-  onSelectedChanged($event: MatSelectionListChange) {
+ 
+onSelectedChanged($event: MatSelectionListChange) {
     if(!this.isEnabled($event.option.value.id)){
       event.preventDefault();
       event.stopPropagation();
       $event.option.selected = false;
     }
   }
-
-  isEnabled(requestId){
+ 
+isEnabled(requestId){
     let price = this.getEntityPrice(requestId);
     if(price && price != "-1"){
       return true;
     }
     return false;
   }
-
-  getShowSubmitSpinner(entityId){
+ 
+getShowSubmitSpinner(entityId){
     let orderObject = this.requestToOrder.get(entityId);
     if(orderObject && orderObject.status == "loading"){
       return true;
     }
     return false;
   }
-
+ 
 }
-
+ 
 const isRestErrorResponse = (object: any): object is RestErrorResponse => 'error' in object;
