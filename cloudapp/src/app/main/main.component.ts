@@ -75,7 +75,14 @@ export class MainComponent implements OnInit, OnDestroy {
   loadEntities(){
     this.loading = true;
     let calls = [];
-    this.pageEntities.forEach(entity => calls.push(this.restService.call(entity.link)));
+    this.pageEntities.forEach(entity => {
+      
+      if(!entity.link.includes("null")){
+        calls.push(this.restService.call(entity.link))
+      }else{
+        console.log('Skipping request. User is null: ' + entity.id);
+      }
+    });
     forkJoin(calls).subscribe({
       next: (s: any[])=>{
         s.forEach(result=>{
