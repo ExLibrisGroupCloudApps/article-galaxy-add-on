@@ -7,7 +7,7 @@
       "connectSrc": [
          "http://*.corp.exlibrisgroup.com:1801",
          "http://*.corp.exlibrisgroup.com:1802",
-         "https://*.alma.exlibrisgroup.com",
+         "https://*.exlibrisgroup.com",
          "http://localhost:1801"
       ]
    },
